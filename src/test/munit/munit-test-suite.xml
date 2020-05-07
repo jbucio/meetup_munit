@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config name="munit-test-suite.xml" />
+	<munit:test name="munit-test-suite-munitSub_FlowTest" description="Test" doc:id="5bdca709-02d3-4279-9c92-d8856efc5431" >
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="1d30fb6e-a6ea-4fbb-b6b4-d3d1d8177ab9" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+var initPayload = readUrl("classpath://sample/database_response.json")
+output application/json
+---
+initPayload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow-ref to munitSub_Flow" doc:id="0e65b4da-f66b-48fe-a9e7-ced33fb04d3a" name="munitSub_Flow"/>
+			<logger level="INFO" doc:name="Logger" doc:id="455b1a59-7e4e-4655-8865-f3cf7c0d560c" message="#[payload]"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="323ea528-646e-46b5-9ac1-5b600eabb20a" expression="#[payload]" is='#[%dw 2.0
+var assert = readUrl("classpath://sample/assert_request.json")
+output application/json
+---
+MunitTools::equalTo(assert)]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="munit-test-suite-munitFlowTest" description="Test" doc:id="00d0ea40-f662-4a8a-b10d-6544fc5edafb" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="3ff924f8-33d0-4e20-91b1-709e18cdc1ec" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="d117b4f2-d043-4685-810c-74b3c5dcca7c" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[%dw 2.0
+var dbPayload = readUrl("classpath://sample/database_response.json")
+output application/json
+---
+dbPayload]'/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="38d219d8-8eff-443f-a3db-bc6ea03a5313" processor="http:request"/>
+		</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="8ec4562f-17ac-493d-b122-ea31abc50403" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+var initPayload = readUrl("classpath://sample/init_payload.json")
+output application/json
+---
+initPayload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow-ref to munitFlow" doc:id="6132e691-e5b7-4643-a2a5-259194445cd1" name="munitFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="a9b02e67-1b5d-4251-a476-5a0d09837367" processor="http:request" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="67fd63d3-060e-4426-8bae-61cce3337645" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="0d2f6076-de3d-43bd-b736-cbe968b69c24" processor="http:request" times="10">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="1eaf903d-6705-4c26-94ad-2502a895b9aa" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

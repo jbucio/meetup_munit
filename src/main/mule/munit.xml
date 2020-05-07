@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="4f0b1dc9-9745-448a-bc78-22a22f3d5810" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="3fb48b5f-90a9-4e48-af0d-46d2b4b4f300" >
+		<db:my-sql-connection host="localhost" port="3306" />
+	</db:config>
+	<flow name="munitFlow" doc:id="f7b17216-3d13-4186-ae88-8cabe7b4840e" >
+		<http:listener doc:name="Listener" doc:id="9b2642cd-c107-4b37-a536-eb628b1dfebd" config-ref="HTTP_Listener_config" path="/"/>
+		<logger level="INFO" doc:name="Logger" doc:id="bdaa3b43-df7a-4249-8ee5-1ef7bf3e289c" message="init :: #[payload]"/>
+		<db:select doc:id="d117b4f2-d043-4685-810c-74b3c5dcca7c" config-ref="Database_Config" doc:name="flights with price">
+			<db:sql >select * from flights</db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="6beabe7a-aede-4867-bb11-513b46240854" message="after DB :: #[payload]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="16aab258-8e59-456b-a994-e1277bd134e8" name="munitSub_Flow"/>
+		<foreach doc:name="For Each" doc:id="5da0f7c5-6042-4701-a8a6-8fdf8636ec32" collection="payload">
+			<choice doc:name="Choice" doc:id="8e6d7c8e-ecbe-41e6-a4fe-29cffcfedf0f" >
+				<when expression="#[payload.precio &lt; 200]">
+					<http:request method="GET" doc:name="vuelo comercial" doc:id="67fd63d3-060e-4426-8bae-61cce3337645" url="localhost"/>
+					<logger level="INFO" doc:name="Logger" doc:id="ee75f5d0-e6b5-4e7c-9cc2-142b328b532b" message="Vuelo comercial"/>
+				</when>
+				<otherwise >
+					<http:request method="GET" doc:name="vuelo turista" doc:id="1eaf903d-6705-4c26-94ad-2502a895b9aa" url="localhost"/>
+					<logger level="INFO" doc:name="Logger" doc:id="71ef4387-97fa-4435-ba65-0d0c254f5596" message="Vuelo turista"/>
+				</otherwise>
+			</choice>
+		</foreach>
+		<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	status: "200"
+}]' doc:name="Set Payload" doc:id="142a4e10-972b-44a5-a700-2725c8f76a8f" />
+	</flow>
+	<sub-flow name="munitSub_Flow" doc:id="4c7bb80c-699f-4386-9f88-690056d3f909" >
+		<ee:transform doc:name="Transform Message" doc:id="5a0cd304-57fe-428f-af3d-bb955c648f5f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( flight , index ) -> {
+	ID: flight.ID,
+	codigo: flight.code,
+	precio: flight.price,
+	fecha_salida: flight.departureDate,
+	asientos: flight.plane.totalSeats
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

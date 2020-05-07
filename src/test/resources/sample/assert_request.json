@@ -1,0 +1,79 @@
+[
+  {
+    "ID": 5,
+    "codigo": "rree1093",
+    "precio": 142,
+    "fecha_salida": "2018-02-11T00:00:00",
+    "asientos": 150
+  },
+  {
+    "ID": 7,
+    "codigo": "eefd1994",
+    "precio": 676,
+    "fecha_salida": "2018-01-01T00:00:00",
+    "asientos": 300
+  },
+  {
+    "ID": 8,
+    "codigo": "ffee2000",
+    "precio": 300,
+    "fecha_salida": "2018-02-20T00:00:00",
+    "asientos": 150
+  },
+  {
+    "ID": 9,
+    "codigo": "eefd3000",
+    "precio": 900,
+    "fecha_salida": "2018-02-01T00:00:00",
+    "asientos": 150
+  },
+  {
+    "ID": 11,
+    "codigo": "rree4567",
+    "precio": 456,
+    "fecha_salida": "2018-01-20T00:00:00",
+    "asientos": 150
+  },
+  {
+    "ID": 1,
+    "codigo": "rree0001",
+    "precio": 541,
+    "fecha_salida": "2018-01-20T00:00:00",
+    "asientos": 200
+  },
+  {
+    "ID": 3,
+    "codigo": "ffee0192",
+    "precio": 300,
+    "fecha_salida": "2018-01-20T00:00:00",
+    "asientos": 300
+  },
+  {
+    "ID": 10,
+    "codigo": "eefd4511",
+    "precio": 900,
+    "fecha_salida": "2018-01-15T00:00:00",
+    "asientos": 300
+  },
+  {
+    "ID": 2,
+    "codigo": "eefd0123",
+    "precio": 300,
+    "fecha_salida": "2018-01-25T00:00:00",
+    "asientos": 345
+  },
+  {
+    "ID": 4,
+    "codigo": "rree1000",
+    "precio": 200,
+    "fecha_salida": "2018-01-20T00:00:00",
+    "asientos": 150
+  },
+  {
+    "ID": 6,
+    "codigo": "ffee1112",
+    "precio": 954,
+    "fecha_salida": "2018-01-20T00:00:00",
+    "asientos": 200
+  }
+]
